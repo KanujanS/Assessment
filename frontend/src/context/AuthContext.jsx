@@ -1,110 +1,51 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import API from "../api/axios";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  const loadUser = async () => {
     try {
-      const u = localStorage.getItem("user");
-      return u ? JSON.parse(u) : null;
-    } catch {
-      return null;
+      const res = await API.get("/profile");
+      setUser(res.data);
+    } catch (err) {
+      setUser(null);
     }
-  });
-  const [token, setToken] = useState(() => localStorage.getItem("token") || null);
-  const [loading, setLoading] = useState(false);
-
-  // axios instance
-  const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "http://localhost:4000/api"
-  });
-
-  // attach token automatically
-  api.interceptors.request.use((config) => {
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
-
-  // simple response interceptor for 401 -> logout (no refresh flow implemented)
-  api.interceptors.response.use(
-    (res) => res,
-    (err) => {
-      if (err.response && err.response.status === 401) {
-        logout();
-      }
-      return Promise.reject(err);
-    }
-  );
+  };
 
   useEffect(() => {
-    if (token) localStorage.setItem("token", token);
-    else localStorage.removeItem("token");
-  }, [token]);
+    if (localStorage.getItem("accessToken")) loadUser();
+  }, []);
 
-  useEffect(() => {
-    if (user) localStorage.setItem("user", JSON.stringify(user));
-    else localStorage.removeItem("user");
-  }, [user]);
+  const login = async (email, password) => {
+    const res = await API.post("/auth/login", { email, password });
+    localStorage.setItem("accessToken", res.data.accessToken);
+    setUser(res.data.user);
+  };
 
   const register = async (payload) => {
-    setLoading(true);
-    try {
-      const res = await api.post("/auth/register", payload);
-      setLoading(false);
-      return res.data;
-    } catch (err) {
-      setLoading(false);
-      throw err;
-    }
+    const res = await API.post("/auth/register", payload);
+    localStorage.setItem("accessToken", res.data.accessToken);
+    setUser(res.data.user);
   };
 
-  const login = async (payload) => {
-    setLoading(true);
-    try {
-      const res = await api.post("/auth/login", payload);
-      const { token: t, user: u } = res.data;
-      setToken(t);
-      setUser(u);
-      setLoading(false);
-      return res.data;
-    } catch (err) {
-      setLoading(false);
-      throw err;
-    }
-  };
-
-  const logout = () => {
-    setToken(null);
+  const logout = async () => {
+    await API.post("/auth/logout");
+    localStorage.removeItem("accessToken");
     setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
+    navigate("/login");
   };
-
-  const apiClient = api;
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        loading,
-        register,
-        login,
-        logout,
-        setUser,
-        setToken,
-        apiClient
-      }}
-    >
+    <AuthContext.Provider value={{ user, login, register, logout, setUser, loadUser }}>
       {children}
     </AuthContext.Provider>
   );
-}
-
-export const useAuth = () => useContext(AuthContext);
+};
 
 export default AuthProvider;
+export const useAuth = () => useContext(AuthContext);

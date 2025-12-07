@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthContext";
 
 const Register = () => {
   const { register } = useAuth();
@@ -10,45 +10,60 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
-  const [success, setSuccess] = useState("");
 
-  const submit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErr("");
-    setSuccess("");
+
     try {
       await register({ name, email, password });
-      setSuccess("Registered. Please login.");
-      setTimeout(() => navigate("/login"), 900);
+      navigate("/");
     } catch (error) {
       setErr(error.response?.data?.message || "Registration failed");
     }
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
-      <h2 className="text-2xl mb-4">Register</h2>
-      {err && <div className="text-red-600 mb-2">{err}</div>}
-      {success && <div className="text-green-600 mb-2">{success}</div>}
-      <form onSubmit={submit} className="space-y-4">
-        <div>
-          <label className="block text-sm">Name</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} required className="w-full border px-3 py-2 rounded" />
-        </div>
-        <div>
-          <label className="block text-sm">Email</label>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" className="w-full border px-3 py-2 rounded" />
-        </div>
-        <div>
-          <label className="block text-sm">Password</label>
-          <input value={password} onChange={(e) => setPassword(e.target.value)} required type="password" className="w-full border px-3 py-2 rounded" />
-        </div>
-        <div>
-          <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded">Register</button>
-        </div>
-      </form>
+    <div className="min-h-screen bg-white dark:bg-gray-800 flex items-center justify-center p-4">
+      <div className="w-full max-w-md p-6 bg-white dark:bg-gray-800 dark:text-white border rounded-xl shadow">
+        <h2 className="flex text-3xl justify-center mb-6">Register</h2>
+
+        {err && (
+          <div className="bg-red-200 p-2 mb-3 text-red-800 rounded-xl">{err}</div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <input
+            placeholder="Name"
+            className="w-full p-2 border rounded-xl"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full p-2 border rounded-xl"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full p-2 border rounded-xl"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button className="w-full bg-green-600 text-white font-semibold p-2 rounded-xl cursor-pointer">
+            Create Account
+          </button>
+          <a href="/login" className="flex justify-center gap-1">Already have an account? <span className="text-blue-600">Login</span></a>
+        </form>
+      </div>
     </div>
   );
-}
+};
 
 export default Register;
