@@ -2,7 +2,6 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL: "http://localhost:4000/api",
-  withCredentials: true,
 });
 
 // Add access token automatically
@@ -42,8 +41,7 @@ API.interceptors.response.use(
       try {
         const res = await axios.post(
           "http://localhost:4000/api/auth/token/refresh",
-          {},
-          { withCredentials: true }
+          {}
         );
 
         const newToken = res.data.accessToken;
