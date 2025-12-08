@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import API from "../api/axios";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const Profile = () => {
   const { user, loadUser } = useAuth();
@@ -15,6 +16,9 @@ const Profile = () => {
 
   const [oldPwd, setOldPwd] = useState("");
   const [newPwd, setNewPwd] = useState("");
+
+  const [showOldPwd, setShowOldPwd] = useState(false);
+  const [showNewPwd, setShowNewPwd] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -73,7 +77,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-800 dark:text-white pt-24 p-4">
-      {/* Responsive Grid: 1 column mobile, 2 columns on md+ */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* LEFT CARD — PROFILE UPDATE */}
         <div className="bg-gray-100 dark:bg-gray-900 p-6 rounded shadow">
@@ -86,7 +89,6 @@ const Profile = () => {
           )}
 
           <form onSubmit={updateProfile} className="space-y-5">
-            {/* Clickable profile image */}
             <label className="cursor-pointer flex justify-center">
               {preview ? (
                 <img
@@ -96,8 +98,6 @@ const Profile = () => {
               ) : (
                 <div className="w-24 h-24 bg-gray-300 rounded-full" />
               )}
-
-              {/* Hidden file input */}
               <input type="file" className="hidden" onChange={handleFile} />
             </label>
 
@@ -139,29 +139,54 @@ const Profile = () => {
             </div>
           )}
 
-          <form onSubmit={changePassword} className="space-y-5 md:space-y-10 md:mt-30">
-            <input
-              type="password"
-              placeholder="Old password"
-              className="w-full p-2 border rounded-xl"
-              value={oldPwd}
-              onChange={(e) => setOldPwd(e.target.value)}
-            />
+          <form onSubmit={changePassword} className="space-y-5">
+            {/* OLD PASSWORD */}
+            <div className="relative">
+              <input
+                type={showOldPwd ? "text" : "password"}
+                placeholder="Old password"
+                className="w-full p-2 border rounded-xl pr-10"
+                value={oldPwd}
+                onChange={(e) => setOldPwd(e.target.value)}
+              />
+              <span
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                onClick={() => setShowOldPwd(!showOldPwd)}
+              >
+                {showOldPwd ? (
+                  <AiOutlineEyeInvisible size={20} />
+                ) : (
+                  <AiOutlineEye size={20} />
+                )}
+              </span>
+            </div>
 
-            <input
-              type="password"
-              placeholder="New password"
-              className="w-full p-2 border rounded-xl"
-              value={newPwd}
-              onChange={(e) => setNewPwd(e.target.value)}
-            />
+            {/* NEW PASSWORD */}
+            <div className="relative">
+              <input
+                type={showNewPwd ? "text" : "password"}
+                placeholder="New password"
+                className="w-full p-2 border rounded-xl pr-10"
+                value={newPwd}
+                onChange={(e) => setNewPwd(e.target.value)}
+              />
+              <span
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                onClick={() => setShowNewPwd(!showNewPwd)}
+              >
+                {showNewPwd ? (
+                  <AiOutlineEyeInvisible size={20} />
+                ) : (
+                  <AiOutlineEye size={20} />
+                )}
+              </span>
+            </div>
 
             <div className="flex justify-end">
               <button className="bg-yellow-600 text-white px-4 py-2 rounded-xl">
-              Change Password
-            </button>
+                Change Password
+              </button>
             </div>
-            
           </form>
         </div>
       </div>
