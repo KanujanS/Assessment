@@ -20,7 +20,11 @@ const Profile = () => {
     if (user) {
       setName(user.name);
       setDob(user.dob ? user.dob.substring(0, 10) : "");
-      setPreview(user.profilePicture ? `http://localhost:4000${user.profilePicture}` : null);
+      setPreview(
+        user.profilePicture
+          ? `http://localhost:4000${user.profilePicture}`
+          : null
+      );
     }
   }, [user]);
 
@@ -68,78 +72,98 @@ const Profile = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-2xl mx-auto">
+    <div className="min-h-screen bg-white dark:bg-gray-800 dark:text-white pt-24 p-4">
+      {/* Responsive Grid: 1 column mobile, 2 columns on md+ */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* LEFT CARD — PROFILE UPDATE */}
+        <div className="bg-gray-100 dark:bg-gray-900 p-6 rounded shadow">
+          <h2 className="text-xl mb-4">Edit Profile</h2>
 
-      <div className="bg-white dark:bg-gray-800 p-6 rounded shadow">
-        <h2 className="text-xl mb-4">Edit Profile</h2>
+          {msg && (
+            <div className="bg-green-200 text-green-900 p-2 mb-3 rounded">
+              {msg}
+            </div>
+          )}
 
-        {msg && <div className="bg-green-200 text-green-900 p-2 mb-3 rounded">{msg}</div>}
+          <form onSubmit={updateProfile} className="space-y-5">
+            {/* Clickable profile image */}
+            <label className="cursor-pointer flex justify-center">
+              {preview ? (
+                <img
+                  src={preview}
+                  className="w-30 h-30 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-24 h-24 bg-gray-300 rounded-full" />
+              )}
 
-        <form onSubmit={updateProfile} className="space-y-3">
+              {/* Hidden file input */}
+              <input type="file" className="hidden" onChange={handleFile} />
+            </label>
 
-          <div className="flex gap-4">
-            {preview ? (
-              <img src={preview} className="w-24 h-24 rounded-full object-cover" />
-            ) : (
-              <div className="w-24 h-24 bg-gray-300 rounded-full" />
-            )}
+            <input
+              className="w-full p-2 border rounded-xl"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Name"
+            />
 
-            <input type="file" onChange={handleFile} />
-          </div>
+            <input
+              type="date"
+              className="w-full p-2 border rounded-xl"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+            />
 
-          <input
-            className="w-full p-2 border rounded"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Name"
-          />
+            <input
+              disabled
+              className="w-full p-2 border rounded-xl bg-gray-100 dark:bg-gray-700"
+              value={user?.email || ""}
+            />
 
-          <input
-            type="date"
-            className="w-full p-2 border rounded"
-            value={dob}
-            onChange={(e) => setDob(e.target.value)}
-          />
+            <div className="flex justify-end">
+              <button className="bg-blue-600 text-white px-4 py-2 rounded-xl">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
 
-          <input
-            disabled
-            className="w-full p-2 border rounded bg-gray-100 dark:bg-gray-700"
-            value={user?.email || ""}
-          />
+        {/* RIGHT CARD — CHANGE PASSWORD */}
+        <div className="bg-gray-100 dark:bg-gray-900 p-6 rounded shadow">
+          <h2 className="text-xl mb-4">Change Password</h2>
 
-          <button className="bg-blue-600 text-white px-4 py-2 rounded">
-            Save Changes
-          </button>
-        </form>
-      </div>
+          {pwdMsg && (
+            <div className="bg-yellow-200 text-yellow-900 p-2 mb-3 rounded">
+              {pwdMsg}
+            </div>
+          )}
 
+          <form onSubmit={changePassword} className="space-y-5 md:space-y-10 md:mt-30">
+            <input
+              type="password"
+              placeholder="Old password"
+              className="w-full p-2 border rounded-xl"
+              value={oldPwd}
+              onChange={(e) => setOldPwd(e.target.value)}
+            />
 
-      <div className="bg-white dark:bg-gray-800 p-6 rounded shadow">
-        <h2 className="text-xl mb-4">Change Password</h2>
+            <input
+              type="password"
+              placeholder="New password"
+              className="w-full p-2 border rounded-xl"
+              value={newPwd}
+              onChange={(e) => setNewPwd(e.target.value)}
+            />
 
-        {pwdMsg && <div className="bg-yellow-200 text-yellow-900 p-2 mb-3 rounded">{pwdMsg}</div>}
-
-        <form onSubmit={changePassword} className="space-y-3">
-          <input
-            type="password"
-            placeholder="Old password"
-            className="w-full p-2 border rounded"
-            value={oldPwd}
-            onChange={(e) => setOldPwd(e.target.value)}
-          />
-
-          <input
-            type="password"
-            placeholder="New password"
-            className="w-full p-2 border rounded"
-            value={newPwd}
-            onChange={(e) => setNewPwd(e.target.value)}
-          />
-
-          <button className="bg-yellow-600 text-white px-4 py-2 rounded">
-            Change Password
-          </button>
-        </form>
+            <div className="flex justify-end">
+              <button className="bg-yellow-600 text-white px-4 py-2 rounded-xl">
+              Change Password
+            </button>
+            </div>
+            
+          </form>
+        </div>
       </div>
     </div>
   );
